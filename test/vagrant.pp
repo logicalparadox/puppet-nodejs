@@ -1,25 +1,13 @@
-stage { pre: before => Stage[main] }
-
-class apt_get_update {
-  $sentinel = "/var/lib/apt/first-puppet-run"
-
-  exec { "initial apt-get update":
-    command => "/usr/bin/apt-get update && touch ${sentinel}",
-    onlyif  => "/usr/bin/env test \\! -f ${sentinel} || /usr/bin/env test \\! -z \"$(find /etc/apt -type f -cnewer ${sentinel})\"",
-    timeout => 3600,
-  }
-}
-
-# Run apt-get update prior to testing
-class { 'apt_get_update':
-  stage => pre,
-}
-
-# Ensure the Vagrant image has a 'puppet' user group for testing
-group { 'puppet':
-  ensure => "present",
-}
-
 class { 'nodejs':
   node_ver => 'v0.6.16'
+}
+
+package { 'express':
+    ensure      => latest
+  , provider    => 'npm'
+}
+
+nodejs::npm { '/tmp/npm::express':
+    ensure      => 'present'
+  , version     => 'latest'
 }
