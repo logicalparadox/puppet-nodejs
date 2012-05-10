@@ -1,10 +1,6 @@
-class nodejs($node_ver = 'v0.6.16') {
+class nodejs($node_ver = 'v0.6.17') {
 
   $node_tar = "node-$node_ver.tar.gz"
-
-  package { "curl":
-    ensure => "installed"
-  }
 
   package { "openssl":
     ensure => "installed"
@@ -14,16 +10,11 @@ class nodejs($node_ver = 'v0.6.16') {
     ensure => "installed"
   }
 
-  package { "build-essential":
-    ensure => "installed"
-  }
-
   exec { 'download_node':
       command   => "curl -o $node_tar http://nodejs.org/dist/${node_ver}/${node_tar}"
     , unless    => 'which node'
     , cwd       => '/tmp'
     , creates   => "/tmp/${node_tar}"
-    , require   => Package['curl']
     , path      => ['/usr/bin/', '/bin/']
   }
 
@@ -43,7 +34,9 @@ class nodejs($node_ver = 'v0.6.16') {
   exec { 'configure_node':
       command   => 'bash ./configure'
     , cwd       => "/tmp/node-${node_ver}"
-    , require   => [File["/tmp/node-${node_ver}"], Package['openssl'], Package['libcurl4-openssl-dev'], Package['build-essential']]
+    , require   => [ File["/tmp/node-${node_ver}"]
+                   , Package['openssl']
+                   , Package['libcurl4-openssl-dev'] ]
     , timeout   => 0
     , creates   => "/tmp/node-${node_ver}/.lock_wscript"
     , path      => ['/usr/bin/', '/bin/']

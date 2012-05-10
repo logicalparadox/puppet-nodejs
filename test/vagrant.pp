@@ -3,7 +3,7 @@ class { 'nodejs':
 }
 
 package { 'express':
-    ensure      => latest
+    ensure      => '2.5.8'
   , provider    => 'npm'
 }
 
