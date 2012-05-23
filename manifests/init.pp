@@ -2,20 +2,37 @@ class nodejs($node_ver = 'v0.6.17') {
 
   $node_tar = "node-$node_ver.tar.gz"
 
-  package { "openssl":
-    ensure => "installed"
+  if defined(Package['openssl']) == false {
+    package { "openssl":
+      ensure => "installed"
+    }
   }
 
-  package { "libcurl4-openssl-dev":
-    ensure => "installed"
+  if defined(Package['libcurl4-openssl-dev']) == false {
+    package { "libcurl4-openssl-dev":
+      ensure => "installed"
+    }
+  }
+
+  if defined(Package['curl']) == false {
+    package { "curl":
+      ensure => "installed"
+    }
+  }
+
+  if defined(Package['build-essential']) == false {
+    package { "build-essential":
+      ensure => "installed"
+    }
   }
 
   exec { 'download_node':
-      command   => "curl -o $node_tar http://nodejs.org/dist/${node_ver}/${node_tar}"
-    , unless    => 'which node'
-    , cwd       => '/tmp'
-    , creates   => "/tmp/${node_tar}"
-    , path      => ['/usr/bin/', '/bin/']
+      command => "curl -o $node_tar http://nodejs.org/dist/${node_ver}/${node_tar}"
+    , unless  => 'which node'
+    , cwd     => '/tmp'
+    , creates => "/tmp/${node_tar}"
+    , path    => ['/usr/bin/', '/bin/']
+    , require => Package["curl"]
   }
 
   exec { 'extract_node':
@@ -36,6 +53,7 @@ class nodejs($node_ver = 'v0.6.17') {
     , cwd       => "/tmp/node-${node_ver}"
     , require   => [ File["/tmp/node-${node_ver}"]
                    , Package['openssl']
+                   , Package["build-essential"]
                    , Package['libcurl4-openssl-dev'] ]
     , timeout   => 0
     , creates   => "/tmp/node-${node_ver}/.lock_wscript"
