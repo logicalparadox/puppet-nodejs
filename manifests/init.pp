@@ -33,7 +33,7 @@ class nodejs($node_ver = 'v0.6.17') {
     , path        => ['/usr/bin/', '/bin/']
     , creates     => "/tmp/${node_tar}"
     , require     => Package["curl"]
-    , refreshonly => true
+    , unless    => "which node && test `node -v` = ${node_ver}"
   }
 
   exec { 'extract_node':
@@ -42,7 +42,6 @@ class nodejs($node_ver = 'v0.6.17') {
     , require     => Exec['download_node']
     , creates     => "/tmp/${node_unpacked}"
     , path        => ['/usr/bin/', '/bin/']
-    , refreshonly => true
   }
 
   exec { 'configure_node':
@@ -54,7 +53,6 @@ class nodejs($node_ver = 'v0.6.17') {
                      , Package['libcurl4-openssl-dev'] ]
     , timeout     => 0
     , path        => ['/usr/bin/', '/bin/']
-    , refreshonly => true
   }
 
   exec { 'make_node': 
@@ -63,7 +61,6 @@ class nodejs($node_ver = 'v0.6.17') {
     , require     => Exec['configure_node']
     , timeout     => 0
     , path        => ['/usr/bin/', '/bin/']
-    , refreshonly => true
   }
 
   exec { 'install_node':
