@@ -33,7 +33,7 @@ class nodejs($node_ver = 'v0.6.17') {
     , path        => ['/usr/bin/', '/bin/']
     , creates     => "/tmp/${node_tar}"
     , require     => Package["curl"]
-    , unless    => "which node && test `node -v` = ${node_ver}"
+    , unless      => "which node && test `node -v` = ${node_ver}"
   }
 
   exec { 'extract_node':
@@ -64,12 +64,11 @@ class nodejs($node_ver = 'v0.6.17') {
   }
 
   exec { 'install_node':
-      command   => 'make install'
-    , cwd       => "/tmp/${node_unpacked}"
-    , require   => Exec['make_node']
-    , timeout   => 0
-    , creates   => '/usr/local/bin/node'
-    , path      => ['/usr/bin/', '/bin/']
-    , unless    => "which node && test `node -v` = ${node_ver}"
+      command     => 'make install'
+    , cwd         => "/tmp/${node_unpacked}"
+    , require     => Exec['make_node']
+    , timeout     => 0
+    , path        => ['/usr/bin/', '/bin/']
+    , unless      => "which node && test `node -v` = ${node_ver}"
   }
 }
