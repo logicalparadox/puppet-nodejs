@@ -30,7 +30,7 @@ class nodejs($node_ver = 'v0.6.17') {
   exec { 'download_node':
       command     => "curl -o $node_tar http://nodejs.org/dist/${node_ver}/${node_tar}"
     , cwd         => '/tmp'
-    , path        => ['/usr/bin/', '/bin/']
+    , path        => ['/usr/local/bin/', '/usr/bin/', '/bin/']
     , creates     => "/tmp/${node_tar}"
     , require     => Package["curl"]
     , unless      => "which node && test `node -v` = ${node_ver}"
@@ -41,7 +41,7 @@ class nodejs($node_ver = 'v0.6.17') {
     , cwd         => '/tmp'
     , require     => Exec['download_node']
     , creates     => "/tmp/${node_unpacked}"
-    , path        => ['/usr/bin/', '/bin/']
+    , path        => ['/usr/local/bin/', '/usr/bin/', '/bin/']
   }
 
   exec { 'configure_node':
@@ -52,15 +52,15 @@ class nodejs($node_ver = 'v0.6.17') {
                      , Package["build-essential"]
                      , Package['libcurl4-openssl-dev'] ]
     , timeout     => 0
-    , path        => ['/usr/bin/', '/bin/']
+    , path        => ['/usr/local/bin/', '/usr/bin/', '/bin/']
   }
 
-  exec { 'make_node': 
+  exec { 'make_node':
       command     => 'make'
     , cwd         => "/tmp/${node_unpacked}"
     , require     => Exec['configure_node']
     , timeout     => 0
-    , path        => ['/usr/bin/', '/bin/']
+    , path        => ['/usr/local/bin/', '/usr/bin/', '/bin/']
   }
 
   exec { 'install_node':
@@ -68,7 +68,7 @@ class nodejs($node_ver = 'v0.6.17') {
     , cwd         => "/tmp/${node_unpacked}"
     , require     => Exec['make_node']
     , timeout     => 0
-    , path        => ['/usr/bin/', '/bin/']
+    , path        => ['/usr/local/bin/', '/usr/bin/', '/bin/']
     , unless      => "which node && test `node -v` = ${node_ver}"
   }
 }
