@@ -1,7 +1,8 @@
 class nodejs($node_ver = 'v0.6.17') {
 
-  $node_tar = "node-$node_ver.tar.gz"
-  $node_unpacked = "node-$node_ver"
+  $node_tar = "node-${node_ver}.tar.gz"
+  $node_unpacked = "node-${node_ver}"
+  $test_installation = "which node && test `node -v` = ${node_ver}"
 
   if defined(Package['openssl']) == false {
     package { "openssl":
@@ -33,7 +34,7 @@ class nodejs($node_ver = 'v0.6.17') {
     , path        => ['/usr/local/bin/', '/usr/bin/', '/bin/']
     , creates     => "/tmp/${node_tar}"
     , require     => Package["curl"]
-    , unless      => "which node && test `node -v` = ${node_ver}"
+    , unless      => $test_installation
   }
 
   exec { 'extract_node':
@@ -42,6 +43,7 @@ class nodejs($node_ver = 'v0.6.17') {
     , require     => Exec['download_node']
     , creates     => "/tmp/${node_unpacked}"
     , path        => ['/usr/local/bin/', '/usr/bin/', '/bin/']
+    , unless      => $test_installation
   }
 
   exec { 'configure_node':
@@ -53,6 +55,7 @@ class nodejs($node_ver = 'v0.6.17') {
                      , Package['libcurl4-openssl-dev'] ]
     , timeout     => 0
     , path        => ['/usr/local/bin/', '/usr/bin/', '/bin/']
+    , unless      => $test_installation
   }
 
   exec { 'make_node':
@@ -61,6 +64,7 @@ class nodejs($node_ver = 'v0.6.17') {
     , require     => Exec['configure_node']
     , timeout     => 0
     , path        => ['/usr/local/bin/', '/usr/bin/', '/bin/']
+    , unless      => $test_installation
   }
 
   exec { 'install_node':
@@ -69,6 +73,6 @@ class nodejs($node_ver = 'v0.6.17') {
     , require     => Exec['make_node']
     , timeout     => 0
     , path        => ['/usr/local/bin/', '/usr/bin/', '/bin/']
-    , unless      => "which node && test `node -v` = ${node_ver}"
+    , unless      => $test_installation
   }
 }
